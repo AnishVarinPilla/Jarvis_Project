@@ -1,8 +1,10 @@
+import os
 import webbrowser
 
 import pyttsx3
 import pywhatkit
 import speech_recognition as sr
+import wikipedia
 
 Assistant = pyttsx3.init('sapi5') #creating a variable to take in the Microsoft Voice Lib assigned with the id = sapi5
 
@@ -46,7 +48,65 @@ def takecommand(): #Defined a Method for the Code to take in Voice Input (possib
 
 
 def TaskExe():
+
+    def Music():
+        Speak("Tell me the Name of the music")
+        musicName = takecommand()
+
+        if 'loca' in musicName :
+
+            os.startfile('E:\\Songs\\loca.mp3')
+
+        elif 'red dead' in musicName :
+
+            os.startfile('E:\\Songs\\red dead.mp3')
+
+        else:
+            pywhatkit.playonyt(musicName)
+            
+        Speak("Your song has been started!")
+
     
+    def Whatsapp():
+        Speak("Tell me the name of the person ")
+        name = takecommand()
+
+        if 'Shobhit' in name:
+            Speak("Tell Me the message")
+            msg = takecommand()
+            Speak("Tell me the time sir")
+            Speak("Time in Hour")
+            hour = int( takecommand())
+            Speak("Time in minute")
+            minute = int(takecommand())
+            pywhatkit.sendwhatmsg("+917893020941",msg,hour,minute,20)
+            Speak("Ok sir sending WhatsApp message")
+
+        elif 'Mom' in name:
+            Speak("Tell Me the message")
+            msg = takecommand()
+            Speak("Tell me the time sir")
+            Speak("Time in Hour")
+            hour = int( takecommand())
+            Speak("Time in minute")
+            minute = int(takecommand())
+            pywhatkit.sendwhatmsg("+919848245049",msg,hour,minute,20)
+            Speak("Ok sir sending WhatsApp message")
+
+        else :
+            Speak("Tell me the phone number")
+            phone = int(takecommand())
+            ph = "+91" = phone
+            Speak("Tell Me the message")
+            msg = takecommand()
+            Speak("Tell me the time sir")
+            Speak("Time in Hour")
+            hour = int( takecommand())
+            Speak("Time in minute")
+            minute = int(takecommand())
+            pywhatkit.sendwhatmsg(ph,msg,hour,minute,20)
+            Speak("Ok sir sending WhatsApp message")
+            
     while True:
 
         query = takecommand()
@@ -92,6 +152,21 @@ def TaskExe():
             web = 'https://www.' + name + '.com'
             webbrowser.open(web)
             Speak("Done Sir")
+
+        elif 'music' in query:
+            Music()
+
+        elif 'wikipedia' in query:
+            Speak("Searching Wikipedia......")
+            query = query.replace("jarvis","")
+            query = query.replace("wikipedia","")
+            wiki = wikipedia.summary(query,2)
+            Speak ("According to wikipedia : {wiki}")
+
+        elif 'Whatsapp' in query:
+            Whatsapp()
+            
+
 
 
 TaskExe()
