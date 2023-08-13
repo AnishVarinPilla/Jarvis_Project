@@ -74,39 +74,28 @@ def TaskExe():
         if 'Shobhit' in name:
             Speak("Tell Me the message")
             msg = takecommand()
-            Speak("Tell me the time sir")
-            Speak("Time in Hour")
-            hour = int( takecommand())
-            Speak("Time in minute")
-            minute = int(takecommand())
-            pywhatkit.sendwhatmsg("+917893020941",msg,hour,minute,20)
+            
+            
+            pywhatkit.sendwhatmsg("+917893020941",msg,0,0,20)
             Speak("Ok sir sending WhatsApp message")
 
-        elif 'Mom' in name:
+        elif 'mummy' in name:
             Speak("Tell Me the message")
             msg = takecommand()
-            Speak("Tell me the time sir")
-            Speak("Time in Hour")
-            hour = int( takecommand())
-            Speak("Time in minute")
-            minute = int(takecommand())
-            pywhatkit.sendwhatmsg("+919848245049",msg,hour,minute,20)
+            
+            pywhatkit.sendwhatmsg("+919848245049",msg,0,0,20)
             Speak("Ok sir sending WhatsApp message")
 
         else :
             Speak("Tell me the phone number")
-            phone = int(takecommand())
-            ph = "+91" = phone
+            phone = takecommand()
+            ph = '+91' + phone
             Speak("Tell Me the message")
             msg = takecommand()
-            Speak("Tell me the time sir")
-            Speak("Time in Hour")
-            hour = int( takecommand())
-            Speak("Time in minute")
-            minute = int(takecommand())
-            pywhatkit.sendwhatmsg(ph,msg,hour,minute,20)
-            Speak("Ok sir sending WhatsApp message")
             
+            pywhatkit.sendwhatmsg(ph,msg,0,0,20)
+            Speak("Ok sir sending WhatsApp message")
+
     while True:
 
         query = takecommand()
@@ -163,7 +152,7 @@ def TaskExe():
             wiki = wikipedia.summary(query,2)
             Speak ("According to wikipedia : {wiki}")
 
-        elif 'Whatsapp' in query:
+        elif 'whatsapp' in query:
             Whatsapp()
             
 
