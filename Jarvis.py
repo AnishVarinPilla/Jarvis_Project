@@ -71,29 +71,30 @@ def TaskExe():
         Speak("Tell me the name of the person ")
         name = takecommand()
 
-        if 'Shobhit' in name:
+        if 'Shobit' or 'Shobhit' in name:
             Speak("Tell Me the message")
             msg = takecommand()
             
             
-            pywhatkit.sendwhatmsg("+917893020941",msg,0,0,20)
+            pywhatkit.sendwhatmsg("+917893020941",msg,9,58)
             Speak("Ok sir sending WhatsApp message")
 
         elif 'mummy' in name:
             Speak("Tell Me the message")
             msg = takecommand()
             
-            pywhatkit.sendwhatmsg("+919848245049",msg,0,0,20)
+            pywhatkit.sendwhatmsg("+919848245049",msg,0,40)
             Speak("Ok sir sending WhatsApp message")
 
         else :
             Speak("Tell me the phone number")
             phone = takecommand()
             ph = '+91' + phone
+            ph = ph.replace(" ","")
             Speak("Tell Me the message")
             msg = takecommand()
             
-            pywhatkit.sendwhatmsg(ph,msg,0,0,20)
+            pywhatkit.sendwhatmsg(ph,msg,9,58)
             Speak("Ok sir sending WhatsApp message")
 
     while True:
@@ -129,9 +130,11 @@ def TaskExe():
             Speak("Ok sir Launching...")
             query = query.replace("jarvis","")
             query = query.replace("website","")
-            query = query.replace("%20","")
+            
             query = query.replace("open","")
-            web2 = "https://www." + query + ".com"
+            
+            query = query.replace(" ","")
+            web2 = "https://www."+query+".com"
             webbrowser.open(web2)
             Speak("Launched")
 
