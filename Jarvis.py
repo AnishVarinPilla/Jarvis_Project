@@ -1,6 +1,7 @@
 import os
 import webbrowser
 
+import pyautogui
 import pyttsx3
 import pywhatkit
 import speech_recognition as sr
@@ -55,11 +56,11 @@ def TaskExe():
 
         if 'loca' in musicName :
 
-            os.startfile('E:\\Songs\\loca.mp3')
+            os.startfile('E:\Songs\loca.mp3')
 
         elif 'red dead' in musicName :
 
-            os.startfile('E:\\Songs\\red dead.mp3')
+            os.startfile('E:\Songs\ red dead.mp3')
 
         else:
             pywhatkit.playonyt(musicName)
@@ -74,16 +75,22 @@ def TaskExe():
         if 'Shobit' or 'Shobhit' in name:
             Speak("Tell Me the message")
             msg = takecommand()
+            Speak("Tell me the Hour")
+            hour = int(takecommand())
+            Speak("Tell me the minute")
+            min = int(takecommand())
             
-            
-            pywhatkit.sendwhatmsg("+917893020941",msg,9,58)
+            pywhatkit.sendwhatmsg("+917893020941",msg,hour,min,10)
             Speak("Ok sir sending WhatsApp message")
 
         elif 'mummy' in name:
             Speak("Tell Me the message")
             msg = takecommand()
-            
-            pywhatkit.sendwhatmsg("+919848245049",msg,0,40)
+            Speak("Tell me the Hour")
+            hour = int(takecommand())
+            Speak("Tell me the minute")
+            min = int(takecommand())
+            pywhatkit.sendwhatmsg("+919848245049",msg,hour,min,10)
             Speak("Ok sir sending WhatsApp message")
 
         else :
@@ -93,8 +100,11 @@ def TaskExe():
             ph = ph.replace(" ","")
             Speak("Tell Me the message")
             msg = takecommand()
-            
-            pywhatkit.sendwhatmsg(ph,msg,9,58)
+            Speak("Tell me the Hour")
+            hour = int(takecommand())
+            Speak("Tell me the minute")
+            min = int(takecommand())
+            pywhatkit.sendwhatmsg(ph,msg,hour,min,10)
             Speak("Ok sir sending WhatsApp message")
 
     while True:
@@ -158,6 +168,15 @@ def TaskExe():
         elif 'whatsapp' in query:
             Whatsapp()
             
+        elif 'screenshot' in query:
+            Speak("What should I name it.")
+            path = takecommand()
+            path1name = path + ".png"
+            path1 = "C:\\Users\\ACER\\OneDrive\\Pictures\\Screenshots\\" +path1name
+            ss = pyautogui.screenshot()
+            ss.save(path1)
+            os.startfile("C:\\Users\\ACER\\OneDrive\\Pictures\\Screenshots")
+
 
 
 
