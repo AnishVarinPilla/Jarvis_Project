@@ -1,7 +1,7 @@
+import datetime
 import os
 import webbrowser
-import time
-
+import pandas as pd
 import keyboard
 import pyautogui
 import pyjokes
@@ -9,9 +9,25 @@ import pyttsx3
 import pywhatkit
 import speech_recognition as sr
 import wikipedia
-from PyDictionary import PyDictionary as Diction
-import datetime
 from playsound import playsound
+from PyDictionary import PyDictionary as Diction
+import mysql.connector
+import numpy as np
+import matplotlib.pyplot as plt
+   
+
+pd.set_option('display.max_column', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_colwidth', None)
+pd.set_option('display.width', None)
+
+mydb = mysql.connector.connect(
+    host = "localhost",
+    user = "root",
+    passwd = "Anish123#",
+    database="MARF"
+)
+mycursor = mydb.cursor()
 
 Assistant = pyttsx3.init('sapi5') #creating a variable to take in the Microsoft Voice Lib assigned with the id = sapi5
 
@@ -47,7 +63,7 @@ def takecommand(): #Defined a Method for the Code to take in Voice Input (possib
 
             print (f"You Said : {query}")
 
-        except Exception as Error:
+        except Exception:
             return "None"
 
         
@@ -60,19 +76,9 @@ def TaskExe():
         Speak("Tell me the Name of the music")
         musicName = takecommand()
 
-        if 'loca' in musicName :
-
-            os.startfile('E:\Songs\loca.mp3')
-
-        elif 'red dead' in musicName :
-
-            os.startfile('E:\Songs\ red dead.mp3')
-
-        else:
-            pywhatkit.playonyt(musicName)
+        pywhatkit.playonyt(musicName)
             
         Speak("Your song has been started!")
-
     
     def Whatsapp():
         Speak("Tell me the name of the person ")
@@ -217,7 +223,76 @@ def TaskExe():
 
             result = Diction.antonym(prob)
             Speak(f"The meaning for {prob} is {result}")
+            
+    def ViewTimetable():
+        Speak("Which day you want to access")
+        query = takecommand()
+        
+        if(query=="Monday"): mycursor.execute("select * from CollegeTimetable where Day = Mon")
+        if(query=="Tuesday"): mycursor.execute("select * from CollegeTimetable where Day = Tues")
+        if(query=="Wednesday"): mycursor.execute("select * from CollegeTimetable where Day = Wed")
+        if(query=="Thursday"): mycursor.execute("select * from CollegeTimetable where Day = Thurs")
+        if(query=="Friday"): mycursor.execute("select * from CollegeTimetable where Day = Fri")
+        result = mycursor._fetch_row()
+        print(result)
+        Speak(f"your {query} timetable is {result}")
+        
+    def EditTimetable():
+        Speak("Which day you want to edit")
+        query=takecommand()
+        Speak("Please State the first element")
+        data_edit1 = takecommand()
+        Speak("Please State the second element")
+        data_edit2 = takecommand()
+        Speak("Please State the third element")
+        data_edit3 = takecommand()
+        Speak("Please State the fourth element")
+        data_edit4 = takecommand()
+        Speak("Please State the fifth element")
+        data_edit5 = takecommand()
+        Speak("Please State the sixth element")
+        data_edit6 = takecommand()
+        Speak("Please State the seventh element")
+        data_edit7 = takecommand()
+        dataInsert = (query,data_edit1,data_edit2,data_edit3,data_edit4,data_edit5,data_edit6,data_edit7)
+        mycursor.execute('''
+            INSERT INTO CollegeTimetable (Day, Time_9_to_10, Time_10_to_11, Time_11_to_12, Time_12_to_1, Time_1_to_2, Time_2_to_3, Time_3_to_4)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+            ''',dataInsert)
+        
+        mydb.commit()
+        Speak("The Timetable has been updated")
+        
+        
+        
+        
+        
 
+    def TakeHindi():
+        command = sr.Recognizer()           #taking in the voice input and recognizing what we are saying
+        with sr.Microphone() as source :    #assiging Mircrophone as the source of Voice Input
+
+            print ('Listening........')
+            command.pause_threshold =1
+            audio = command.listen(source)
+
+            try :
+                print ("Recognizing.......")
+
+                #processes the input you have given and decrypts it using google recognized language
+                query = command.recognize_google(audio,language='hi') 
+
+                print (f"You Said : {query}")
+
+            except Exception:
+                return "None"
+
+
+        
+        return query.lower()
+
+    
+        
     while True:
 
         query = takecommand()
@@ -239,6 +314,8 @@ def TaskExe():
             web ='https://www.youtube.com/results?search_query='+query
             webbrowser.open(web)
             Speak("Done Sir")
+        
+        
 
         elif 'google search' in query:
             Speak ("This is what I Found for your search")
@@ -274,7 +351,7 @@ def TaskExe():
             query = query.replace("jarvis","")
             query = query.replace("wikipedia","")
             wiki = wikipedia.summary(query,2)
-            Speak ("According to wikipedia : {wiki}")
+            Speak (f"According to wikipedia : {wiki}")
 
         elif 'whatsapp' in query:
             Whatsapp()
@@ -340,6 +417,12 @@ def TaskExe():
         elif 'chrome automation' in query:
             ChromeAutomation()
         
+        elif 'view timetable' in query:
+            ViewTimetable()
+        
+        elif 'edit timetable' in query:
+            EditTimetable()
+            
         elif 'joke' in query :
             get = pyjokes.get_joke()
             Speak(get)
@@ -357,6 +440,9 @@ def TaskExe():
         elif 'dictionary' in query:
             Dict()
 
+        elif 'hindi' in query:
+            TakeHindi()
+            
         elif 'alarm' in query:
             Speak("Enter the Time")
             time = input(": Enter the Time :")
@@ -372,6 +458,10 @@ def TaskExe():
                         time.sleep(1)
                     
                     Speak("Alarm closed ha ha")
+                
+                elif now > time:
+                    break
+                
                     
 
 
