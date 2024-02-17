@@ -1,7 +1,6 @@
 import datetime
 import os
 import webbrowser
-import pandas as pd
 import keyboard
 import pyautogui
 import pyjokes
@@ -10,25 +9,25 @@ import pywhatkit
 import speech_recognition as sr
 import wikipedia
 from playsound import playsound
-from PyDictionary import PyDictionary as Diction
-import mysql.connector
-import numpy as np
-import matplotlib.pyplot as plt
-   
+from pydictionary import Dictionary
+from supabase import create_client, Client
+import json
 
-pd.set_option('display.max_column', None)
-pd.set_option('display.max_rows', None)
-pd.set_option('display.max_colwidth', None)
-pd.set_option('display.width', None)
+url: str = os.environ.get("https://bpvqpkigcjnqplpbdisx.supabase.co")
+key: str = os.environ.get("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwdnFwa2lnY2pucXBscGJkaXN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDcyOTU2MzEsImV4cCI6MjAyMjg3MTYzMX0.MKlMzhFGw4Bo6_eiAkgnIXMxrV0Zt8fkoIr6Cc8Sxfo")
+supabase: Client = create_client(url,key)
 
-mydb = mysql.connector.connect(
-    host = "localhost",
-    user = "root",
-    passwd = "Anish123#",
-    database="MARF"
-)
-mycursor = mydb.cursor()
+# Define a global variable to store the file path
+function_history_file = "function_history.json"
 
+# Load function history from file if available
+try:
+    with open(function_history_file, "r") as file:
+        function_history = json.load(file)
+except FileNotFoundError:
+    
+    function_history = {}
+    
 Assistant = pyttsx3.init('sapi5') #creating a variable to take in the Microsoft Voice Lib assigned with the id = sapi5
 
 voices = Assistant.getProperty('voices') #taking the voices which are available into a array in voices variable
@@ -68,9 +67,13 @@ def takecommand(): #Defined a Method for the Code to take in Voice Input (possib
 
         
         return query.lower()
+    
+    
 
 
 def TaskExe():
+    
+    global function_history
 
     def Music():
         Speak("Tell me the Name of the music")
@@ -206,65 +209,64 @@ def TaskExe():
         if 'meaning' in prob:
             prob = prob.replace('what is the meaning of ', '')
             prob = prob.replace('jarvis', '')
-
-            result = Diction.meaning(prob)
+            Diction=Dictionary(prob,3)
+            result = Diction.meanings()
             Speak(f"The meaning for {prob} is {result}")
 
         elif 'synonym' in prob:
             prob = prob.replace('what is the synonym of ', '')
             prob = prob.replace('jarvis', '')
-
-            result = Diction.synonym(prob)
+            Diction=Dictionary(prob,3)
+            result = Diction.synonyms(prob)
             Speak(f"The meaning for {prob} is {result}")
         
         elif 'antonym' in prob:
             prob = prob.replace('what is the antonym of ', '')
             prob = prob.replace('jarvis', '')
-
-            result = Diction.antonym(prob)
+            Diction=Dictionary(prob,3)
+            result = Diction.antonyms(prob)
             Speak(f"The meaning for {prob} is {result}")
             
     def ViewTimetable():
         Speak("Which day you want to access")
         query = takecommand()
         
-        if(query=="Monday"): mycursor.execute("select * from CollegeTimetable where Day = Mon")
-        if(query=="Tuesday"): mycursor.execute("select * from CollegeTimetable where Day = Tues")
-        if(query=="Wednesday"): mycursor.execute("select * from CollegeTimetable where Day = Wed")
-        if(query=="Thursday"): mycursor.execute("select * from CollegeTimetable where Day = Thurs")
-        if(query=="Friday"): mycursor.execute("select * from CollegeTimetable where Day = Fri")
-        result = mycursor._fetch_row()
-        print(result)
-        Speak(f"your {query} timetable is {result}")
+        if(query=="Monday"): response = supabase.table('Timetable').select("Mon").execute() 
+        if(query=="Tuesday"):response = supabase.table('Timetable').select("Tues").execute()
+        if(query=="Wednesday"):response = supabase.table('Timetable').select("Wed").execute()
+        if(query=="Thursday"):response = supabase.table('Timetable').select("Thur").execute()
+        if(query=="Friday"):response = supabase.table('Timetable').select("Fri").execute()
+        if(query=="All"): response = supabase.table('Timetable').select("*").execute()
+        
+        print(response)
+        Speak(f"your {query} timetable is {response}")
         
     def EditTimetable():
         Speak("Which day you want to edit")
         query=takecommand()
-        Speak("Please State the first element")
-        data_edit1 = takecommand()
-        Speak("Please State the second element")
-        data_edit2 = takecommand()
-        Speak("Please State the third element")
-        data_edit3 = takecommand()
-        Speak("Please State the fourth element")
-        data_edit4 = takecommand()
-        Speak("Please State the fifth element")
-        data_edit5 = takecommand()
-        Speak("Please State the sixth element")
-        data_edit6 = takecommand()
-        Speak("Please State the seventh element")
-        data_edit7 = takecommand()
-        dataInsert = (query,data_edit1,data_edit2,data_edit3,data_edit4,data_edit5,data_edit6,data_edit7)
-        mycursor.execute('''
-            INSERT INTO CollegeTimetable (Day, Time_9_to_10, Time_10_to_11, Time_11_to_12, Time_12_to_1, Time_1_to_2, Time_2_to_3, Time_3_to_4)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
-            ''',dataInsert)
-        
-        mydb.commit()
+        Speak("Pick a Number to edit the the time slot you want to update")
+        Speak("Pick 1 for 8 am -9am, Pick 2 for 9 am - 10am, Pick 3 for 10 am - 11 am, Pick 4 for 11 am - 12 pm, Pick 5 for 12 pm - 1 pm, Pick 6 for 1 pm - 2 pm, Pick 7 for 2 pm - 3pm, Pick 8 for 3 pm - 4 pm, Pick 9 for 4 pm - 5 pm")
+        query_slot= int(takecommand())
+        Speak("What is the subject you want to keep in the time slot")
+        query_sub = takecommand()
+        if(query_slot==1):
+            supabase.table('Timetable').update({'8am-9am': query_sub}).eq('Day',query).execute()
+        if(query_slot==2):
+            supabase.table('Timetable').update({'9am-10am': query_sub}).eq('Day',query).execute()
+        if(query_slot==3):
+            supabase.table('Timetable').update({'10am-11am': query_sub}).eq('Day',query).execute()
+        if(query_slot==4):
+            supabase.table('Timetable').update({'8am-9am': query_sub}).eq('Day',query).execute()
+        if(query_slot==5):
+            supabase.table('Timetable').update({'8am-9am': query_sub}).eq('Day',query).execute()
+        if(query_slot==6):
+            supabase.table('Timetable').update({'8am-9am': query_sub}).eq('Day',query).execute()
+        if(query_slot==7):
+            supabase.table('Timetable').update({'8am-9am': query_sub}).eq('Day',query).execute()  
+    
         Speak("The Timetable has been updated")
         
-        
-        
+    
         
         
 
@@ -299,6 +301,12 @@ def TaskExe():
         if 'hello' in query :
             Speak ("Hello sir, how may I help you")
             Speak ("I am JARVIS, your personal AI Assistant")
+            # Recommend the three most used functions
+            recommended_functions = sorted(function_history, key=function_history.get, reverse=True)[:3]
+            Speak("Here are the three most used functions:")
+            for func in recommended_functions:
+                Speak (func)
+
         
         elif 'how are you' in query :
             Speak ("I am Fine, what are you doing?")
@@ -461,6 +469,15 @@ def TaskExe():
                 
                 elif now > time:
                     break
+        
+        if query in function_history:
+            function_history[query] += 1
+        else:
+            function_history[query] = 1
+        
+        # Save function history to file before exiting
+        with open(function_history_file, "w") as file:
+            json.dump(function_history, file)
                 
                     
 
